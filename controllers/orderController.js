@@ -72,18 +72,19 @@ export const placeOrderStripe = async (req, res)=>{
 
     // create line items for stripe
 
-     const line_items = productData.map((item)=>{
-        return {
-            price_data: {
-                currency: "usd",
-                product_data:{
-                    name: item.name,
-                },
-                unit_amount: Math.floor(item.price + item.price * 0.02)  * 100
+     const line_items = productData.map((item) => {
+    const priceWithFee = item.price + item.price * 0.02; // Add 2% fee
+    return {
+        price_data: {
+            currency: "pkr", // Changed to PKR
+            product_data: {
+                name: item.name,
             },
-            quantity: item.quantity,
-        }
-     })
+            unit_amount: Math.round(priceWithFee * 100), // Convert to paisa
+        },
+        quantity: item.quantity,
+    };
+});
 
      // create session
      const session = await stripeInstance.checkout.sessions.create({
